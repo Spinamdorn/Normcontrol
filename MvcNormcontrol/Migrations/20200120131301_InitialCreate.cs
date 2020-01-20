@@ -18,9 +18,10 @@ namespace MvcNormcontrol.Migrations
                     Patronymic = table.Column<string>(nullable: true),
                     Group = table.Column<string>(maxLength: 20, nullable: false),
                     Discipline = table.Column<string>(nullable: true),
-                    Type = table.Column<string>(nullable: true),
                     CompletionDate = table.Column<DateTime>(nullable: false),
-                    ReportStatus = table.Column<int>(nullable: true)
+                    ReportStatus = table.Column<int>(nullable: true),
+                    UniqueDocName = table.Column<string>(nullable: true),
+                    DocName = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {

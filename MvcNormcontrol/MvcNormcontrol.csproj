@@ -17,6 +17,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data\" />
+    <Folder Include="wwwroot\Documents\" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="MvcStudent.db" />

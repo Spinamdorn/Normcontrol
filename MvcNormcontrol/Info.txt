@@ -1,1 +1,3 @@
 ﻿dotnet aspnet-codegenerator controller -name StudentsController -m Student -dc MvcNormcontrolContext --relativeFolderPath Controllers --useDefaultLayout --referenceScriptLibraries
+dotnet ef migrations add InitialCreate
+dotnet ef database update

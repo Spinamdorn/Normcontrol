@@ -1,7 +1,9 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -13,10 +15,12 @@ namespace MvcNormcontrol.Controllers
     public class StudentsController : Controller
     {
         private readonly MvcNormcontrolContext _context;
+        private readonly IWebHostEnvironment hostingEnvironment;
 
-        public StudentsController(MvcNormcontrolContext context)
+        public StudentsController(MvcNormcontrolContext context, IWebHostEnvironment hostingEnvironment)
         {
             _context = context;
+            this.hostingEnvironment = hostingEnvironment;
         }
 
         // GET: Students
@@ -37,6 +41,17 @@ namespace MvcNormcontrol.Controllers
                 Students = await students.ToListAsync()
             };
             return View(studentGroupVM);
+        }
+
+        public IActionResult GetFile(string fileName, string shortName)
+        {
+            if (fileName == null)
+                return Content("Файл не загружен");
+            // Путь к файлу
+            string file_path = Path.Combine(hostingEnvironment.WebRootPath, "Documents", fileName);
+            // Тип файла - content-type
+            string file_type = "application/vnd.ms-word";
+            return PhysicalFile(file_path, file_type, shortName);
         }
 
         // GET: Students/Details/5
@@ -68,15 +83,44 @@ namespace MvcNormcontrol.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Lastname,Name,Patronymic,Group,Discipline,CompletionDate,ReportStatus")] Student student)
+        public async Task<IActionResult> Create(StudentCreateViewModel student)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(student);
+                var newStudent = new Student
+                {
+                    Name = student.Name,
+                    Lastname = student.Lastname,
+                    Patronymic = student.Patronymic,
+                    Group = student.Group,
+                    Discipline = student.Discipline,
+                    CompletionDate = DateTime.Today
+                };
+                var nameAndPath = ProcessUploadedFile(student);
+                newStudent.DocName = nameAndPath[0];
+                newStudent.UniqueDocName = nameAndPath[1];
+                _context.Add(newStudent);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("details", new { id = newStudent.ID });
             }
-            return View(student);
+            //return View(student);
+            return View();
+        }
+
+        private string[] ProcessUploadedFile(StudentCreateViewModel student)
+        {
+            string fileName = null;
+            string uniqueFileName = null;
+            if (student.Document != null)
+            {
+                fileName = student.Document.FileName;
+                var uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "Documents");
+                uniqueFileName = Guid.NewGuid().ToString() + "_" + student.Document.FileName;
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                using var fileStream = new FileStream(filePath, FileMode.Create);
+                student.Document.CopyTo(fileStream);
+            }
+            return new string[] { fileName, uniqueFileName };
         }
 
         // GET: Students/Edit/5
@@ -88,12 +132,22 @@ namespace MvcNormcontrol.Controllers
             }
 
             var student = await _context.Student.FindAsync(id);
+            var studentEditViewModel = new StudentEditViewModel
+            {
+                ID = student.ID,
+                Lastname = student.Lastname,
+                Name = student.Name,
+                Patronymic = student.Patronymic,
+                Group = student.Group,
+                Discipline = student.Discipline,
+                ExistingDocName = student.DocName,
+                ExistingUniqueDocName = student.UniqueDocName
+            };
             if (student == null)
             {
                 return NotFound();
             }
-            student.CompletionDate = DateTime.Today;
-            return View(student);
+            return View(studentEditViewModel);
         }
 
         // POST: Students/Edit/5
@@ -101,7 +155,7 @@ namespace MvcNormcontrol.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Lastname,Name,Patronymic,Group,Discipline,CompletionDate,ReportStatus")] Student student)
+        public async Task<IActionResult> Edit(int id, StudentEditViewModel student)
         {
             if (id != student.ID)
             {
@@ -112,7 +166,25 @@ namespace MvcNormcontrol.Controllers
             {
                 try
                 {
-                    _context.Update(student);
+                    var updateStudent = await _context.Student.FindAsync(student.ID);
+                    updateStudent.Lastname = student.Lastname;
+                    updateStudent.Name = student.Name;
+                    updateStudent.Patronymic = student.Patronymic;
+                    updateStudent.Group = student.Group;
+                    updateStudent.Discipline = student.Discipline;
+                    updateStudent.CompletionDate = DateTime.Today;
+                    if (student.Document != null)
+                    {
+                        if (student.ExistingUniqueDocName != null)
+                        {
+                            string filePath = Path.Combine(hostingEnvironment.WebRootPath,"Documents", student.ExistingUniqueDocName);
+                            System.IO.File.Delete(filePath);
+                        }
+                        var nameAndPath = ProcessUploadedFile(student);
+                        updateStudent.DocName = nameAndPath[0];
+                        updateStudent.UniqueDocName = nameAndPath[1];
+                    }
+                    _context.Update(updateStudent);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -126,7 +198,7 @@ namespace MvcNormcontrol.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("details",new { id=student.ID});
             }
             return View(student);
         }
@@ -155,6 +227,11 @@ namespace MvcNormcontrol.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var student = await _context.Student.FindAsync(id);
+            if (student.UniqueDocName!=null)
+            {
+                var filePath = Path.Combine(hostingEnvironment.WebRootPath, "Documents", student.UniqueDocName);
+                System.IO.File.Delete(filePath);
+            }
             _context.Student.Remove(student);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

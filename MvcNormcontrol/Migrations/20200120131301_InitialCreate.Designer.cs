@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MvcNormcontrol.Data;
 
 namespace MvcNormcontrol.Migrations
 {
     [DbContext(typeof(MvcNormcontrolContext))]
-    partial class MvcNormcontrolContextModelSnapshot : ModelSnapshot
+    [Migration("20200120131301_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -26,6 +28,9 @@ namespace MvcNormcontrol.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Discipline")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DocName")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Group")
@@ -49,7 +54,7 @@ namespace MvcNormcontrol.Migrations
                     b.Property<int?>("ReportStatus")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Type")
+                    b.Property<string>("UniqueDocName")
                         .HasColumnType("TEXT");
 
                     b.HasKey("ID");

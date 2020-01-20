@@ -27,7 +27,8 @@ namespace MvcNormcontrol.Models
                         Name = "Сергей",
                         Patronymic = "Александрович",
                         Group = "РИ-370010",
-                        Discipline = "Математика"
+                        Discipline = "Математика",
+                        CompletionDate=new DateTime(2020,1,1)
                     },
                     new Student
                     {
@@ -35,7 +36,8 @@ namespace MvcNormcontrol.Models
                         Name = "Ольга",
                         Patronymic = "Дмитриевна",
                         Group = "РИ-370010",
-                        Discipline = "Математика"
+                        Discipline = "Математика",
+                        CompletionDate = new DateTime(2020, 1, 1)
                     },
                     new Student
                     {
@@ -43,7 +45,8 @@ namespace MvcNormcontrol.Models
                         Name = "Олег",
                         Patronymic = "Сергеевич",
                         Group = "РИ-370011",
-                        Discipline = "Математика"
+                        Discipline = "Математика",
+                        CompletionDate = new DateTime(2020, 1, 1)
                     },
                     new Student
                     {
@@ -51,7 +54,8 @@ namespace MvcNormcontrol.Models
                         Name = "Александра",
                         Patronymic = "Сергеевна",
                         Group = "РИ-370011",
-                        Discipline = "Математика"
+                        Discipline = "Математика",
+                        CompletionDate = new DateTime(2020, 1, 1)
                     }
                 );
                 context.SaveChanges();
