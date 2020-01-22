@@ -51,5 +51,29 @@ namespace MvcNormcontrol.Models
 
         [Display(Name = "Имя файла")]
         public string DocName { get; set; }
+
+        public static Student CreateNewStudent(StudentCreateViewModel student)
+        {
+            return new Student
+            {
+                Name = student.Name,
+                Lastname = student.Lastname,
+                Patronymic = student.Patronymic,
+                Group = student.Group,
+                Discipline = student.Discipline,
+                CompletionDate = DateTime.Today
+            };
+        }
+
+        public static Student UpdateStudent(Student updateStudent, StudentEditViewModel student)
+        {
+            updateStudent.Lastname = student.Lastname;
+            updateStudent.Name = student.Name;
+            updateStudent.Patronymic = student.Patronymic;
+            updateStudent.Group = student.Group;
+            updateStudent.Discipline = student.Discipline;
+            updateStudent.CompletionDate = DateTime.Today;
+            return updateStudent;
+        }
     }
 }

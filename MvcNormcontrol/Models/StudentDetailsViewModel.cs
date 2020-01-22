@@ -56,7 +56,8 @@ namespace MvcNormcontrol.Models
             Discipline = student.Discipline;
             CompletionDate = student.CompletionDate;
             ReportStatus = student.ReportStatus;
-            ErrorList = Algorithm.Algorithm.ErrorStringToList(student.ErrorList);
+            if(student.ErrorList!=null)
+                ErrorList = WordDocument.ErrorsForOut(student.ErrorList);
             UniqueDocName = student.UniqueDocName;
             DocName = student.DocName;
         }

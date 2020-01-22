@@ -86,39 +86,14 @@ namespace MvcNormcontrol.Controllers
         {
             if (ModelState.IsValid)
             {
-                var newStudent = new Student
-                {
-                    Name = student.Name,
-                    Lastname = student.Lastname,
-                    Patronymic = student.Patronymic,
-                    Group = student.Group,
-                    Discipline = student.Discipline,
-                    CompletionDate = DateTime.Today
-                };
-                var nameAndPath = ProcessUploadedFile(student);
-                newStudent.DocName = nameAndPath[0];
-                newStudent.UniqueDocName = nameAndPath[1];
+                Student newStudent = Student.CreateNewStudent(student);
+                Algorithm.UploadDownloadFile.UploadFile(student, newStudent,hostingEnvironment);
+                Algorithm.UploadDownloadFile.Normcontrol(newStudent,hostingEnvironment);
                 _context.Add(newStudent);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("details", new { id = newStudent.ID });
             }
             return View();
-        }
-
-        private string[] ProcessUploadedFile(StudentCreateViewModel student)
-        {
-            string fileName = null;
-            string uniqueFileName = null;
-            if (student.Document != null)
-            {
-                fileName = student.Document.FileName;
-                var uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "Documents");
-                uniqueFileName = Guid.NewGuid().ToString() + "_" + student.Document.FileName;
-                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-                using var fileStream = new FileStream(filePath, FileMode.Create);
-                student.Document.CopyTo(fileStream);
-            }
-            return new string[] { fileName, uniqueFileName };
         }
 
         // GET: Students/Edit/5
@@ -130,23 +105,15 @@ namespace MvcNormcontrol.Controllers
             }
 
             var student = await _context.Student.FindAsync(id);
-            var studentEditViewModel = new StudentEditViewModel
-            {
-                ID = student.ID,
-                Lastname = student.Lastname,
-                Name = student.Name,
-                Patronymic = student.Patronymic,
-                Group = student.Group,
-                Discipline = student.Discipline,
-                ExistingDocName = student.DocName,
-                ExistingUniqueDocName = student.UniqueDocName,
-            };
+            var studentEditViewModel = StudentEditViewModel.CreateNewStudent(student);
             if (student == null)
             {
                 return NotFound();
             }
             return View(studentEditViewModel);
         }
+
+        
 
         // POST: Students/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
@@ -165,22 +132,12 @@ namespace MvcNormcontrol.Controllers
                 try
                 {
                     var updateStudent = await _context.Student.FindAsync(student.ID);
-                    updateStudent.Lastname = student.Lastname;
-                    updateStudent.Name = student.Name;
-                    updateStudent.Patronymic = student.Patronymic;
-                    updateStudent.Group = student.Group;
-                    updateStudent.Discipline = student.Discipline;
-                    updateStudent.CompletionDate = DateTime.Today;
+                    updateStudent = Student.UpdateStudent(updateStudent, student);
                     if (student.Document != null)
                     {
-                        if (student.ExistingUniqueDocName != null)
-                        {
-                            string filePath = Path.Combine(hostingEnvironment.WebRootPath, "Documents", student.ExistingUniqueDocName);
-                            System.IO.File.Delete(filePath);
-                        }
-                        var nameAndPath = ProcessUploadedFile(student);
-                        updateStudent.DocName = nameAndPath[0];
-                        updateStudent.UniqueDocName = nameAndPath[1];
+                        Algorithm.UploadDownloadFile.DeleteFile(student,hostingEnvironment);
+                        Algorithm.UploadDownloadFile.UploadFile(student, updateStudent,hostingEnvironment);
+                        Algorithm.UploadDownloadFile.Normcontrol(updateStudent, hostingEnvironment);
                     }
                     _context.Update(updateStudent);
                     await _context.SaveChangesAsync();
@@ -225,11 +182,7 @@ namespace MvcNormcontrol.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var student = await _context.Student.FindAsync(id);
-            if (student.UniqueDocName != null)
-            {
-                var filePath = Path.Combine(hostingEnvironment.WebRootPath, "Documents", student.UniqueDocName);
-                System.IO.File.Delete(filePath);
-            }
+            Algorithm.UploadDownloadFile.DeleteFile(student,hostingEnvironment);
             _context.Student.Remove(student);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

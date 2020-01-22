@@ -8,13 +8,7 @@ namespace MvcNormcontrol.Data
         public MvcNormcontrolContext(DbContextOptions<MvcNormcontrolContext> options)
             : base(options) { }
 
-        public DbSet<MvcNormcontrol.Models.Student> Student { get; set; }
-
-        //protected override void OnModelCreating(ModelBuilder modelBuilder)
-        //{
-        //    modelBuilder.Entity<Student>().ToTable("Student");
-        //    modelBuilder.Entity<Student>().HasKey(c => new { c.Lastname, c.Name, c.Group });
-        //}
+        public DbSet<Student> Student { get; set; }
     }
 }
 /*Представленный выше код создает свойство DbSet для набора сущностей.
