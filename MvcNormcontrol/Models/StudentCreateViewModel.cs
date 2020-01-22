@@ -27,7 +27,7 @@ namespace MvcNormcontrol.Models
         [Display(Name = "Дисциплина")]
         public string Discipline { get; set; }
 
-        //[FileExtensions (Extensions =".docx,.doc", ErrorMessage = "Incorrect file format")]
+        [Display(Name="Документ")]
         public IFormFile Document { get; set; }
     }
 }

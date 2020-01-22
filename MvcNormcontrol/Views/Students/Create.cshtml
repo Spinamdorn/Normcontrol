@@ -38,6 +38,13 @@
                 <span asp-validation-for="Discipline" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <p>
+                    Текст следует загружать без титульного листа и задания.
+                    <br />
+                    Первая страница - оглавление
+                </p>
+            </div>
+            <div class="form-group">
                 <label asp-for="Document" class="control-label"></label>
                 <div class="custom-file">
                     <input asp-for="Document" type="file" accept=".docx" class="form-control custom-file-input" />
