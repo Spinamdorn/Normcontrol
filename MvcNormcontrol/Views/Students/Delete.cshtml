@@ -1,7 +1,7 @@
 @model MvcNormcontrol.Models.Student
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Удалить";
 }
 
 <h1>Удаление</h1>
@@ -41,12 +41,17 @@
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Discipline)
         </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.DocName)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.DocName)
-        </dd>
+        @if (Model.UniqueDocName != null)
+        {
+            <dt class="col-sm-2">
+                Загруженный файл:
+            </dt>
+            <dd class="col-sm-10">
+                <a asp-action="GetFile" asp-route-fileName="@Model.UniqueDocName" asp-route-shortName="@Model.DocName">
+                    @Model.DocName
+                </a>
+            </dd>
+        }
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.CompletionDate)
         </dt>

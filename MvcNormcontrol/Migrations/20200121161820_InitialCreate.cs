@@ -20,6 +20,7 @@ namespace MvcNormcontrol.Migrations
                     Discipline = table.Column<string>(nullable: true),
                     CompletionDate = table.Column<DateTime>(nullable: false),
                     ReportStatus = table.Column<int>(nullable: true),
+                    ErrorList = table.Column<string>(nullable: true),
                     UniqueDocName = table.Column<string>(nullable: true),
                     DocName = table.Column<string>(nullable: true)
                 },

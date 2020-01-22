@@ -1,7 +1,7 @@
-@model MvcNormcontrol.Models.Student
+@model MvcNormcontrol.Models.StudentDetailsViewModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Подробнее";
 }
 
 <h1>Подробности</h1>
@@ -46,20 +46,32 @@
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.CompletionDate)
         </dd>
-        <dt class="col-sm-2">
-            Отредактированный файл: 
-        </dt>
-        <dd class="col-sm-10">
-            <a asp-action="GetFile" asp-route-fileName="@Model.UniqueDocName" asp-route-shortName="@Model.DocName">
-                @Model.DocName
-            </a>
-        </dd>
+        @if (Model.UniqueDocName != null)
+        {
+            <dt class="col-sm-2">
+                Отредактированный файл:
+            </dt>
+            <dd class="col-sm-10">
+                <a asp-action="GetFile" asp-route-fileName="@Model.UniqueDocName" asp-route-shortName="@Model.DocName">
+                    @Model.DocName
+                </a>
+            </dd>
+        }
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.ReportStatus)
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.ReportStatus)
         </dd>
+        @if (Model.ReportStatus == Student.Status.Falled)
+        {
+            foreach (var error in Model.ErrorList)
+            {
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(modelError => error)
+                </dd>
+            }
+        }
     </dl>
 </div>
 <div>

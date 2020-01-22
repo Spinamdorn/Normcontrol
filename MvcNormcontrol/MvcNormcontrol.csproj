@@ -18,6 +18,7 @@
   <ItemGroup>
     <Folder Include="Data\" />
     <Folder Include="wwwroot\Documents\" />
+    <Folder Include="Algorithm\" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="MvcStudent.db" />

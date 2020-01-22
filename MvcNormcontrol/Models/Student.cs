@@ -5,7 +5,13 @@ namespace MvcNormcontrol.Models
 {
     public class Student
     {
-        public enum Status { Passed, Falled };
+        public enum Status {
+            [Display(Name ="Сдано")]
+            Passed,
+            [Display(Name ="Не сдано")]
+            Falled
+        };
+
         [Key]
         public int ID { get; set; }
 
@@ -39,7 +45,10 @@ namespace MvcNormcontrol.Models
         [Display(Name = "Результат проверки")]
         public Status? ReportStatus { get; set; }
 
+        public string ErrorList { get; set; }
+
         public string UniqueDocName { get; set; }
+
         [Display(Name = "Имя файла")]
         public string DocName { get; set; }
     }

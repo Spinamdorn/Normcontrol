@@ -31,9 +31,9 @@ namespace MvcNormcontrol.Controllers
                                             select m.Group;
             var students = from m in _context.Student
                            select m;
-            if (!String.IsNullOrEmpty(searchString))
+            if (!string.IsNullOrEmpty(searchString))
                 students = students.Where(s => s.Lastname.Contains(searchString));
-            if (!String.IsNullOrEmpty(studentGroup))
+            if (!string.IsNullOrEmpty(studentGroup))
                 students = students.Where(x => x.Group == studentGroup);
             var studentGroupVM = new StudentGroupViewModel
             {
@@ -47,9 +47,7 @@ namespace MvcNormcontrol.Controllers
         {
             if (fileName == null)
                 return Content("Файл не загружен");
-            // Путь к файлу
             string file_path = Path.Combine(hostingEnvironment.WebRootPath, "Documents", fileName);
-            // Тип файла - content-type
             string file_type = "application/vnd.ms-word";
             return PhysicalFile(file_path, file_type, shortName);
         }
@@ -64,12 +62,13 @@ namespace MvcNormcontrol.Controllers
 
             var student = await _context.Student
                 .FirstOrDefaultAsync(m => m.ID == id);
+            var studentDetails = new StudentDetailsViewModel(student);
             if (student == null)
             {
                 return NotFound();
             }
 
-            return View(student);
+            return View(studentDetails);
         }
 
         // GET: Students/Create
@@ -103,7 +102,6 @@ namespace MvcNormcontrol.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction("details", new { id = newStudent.ID });
             }
-            //return View(student);
             return View();
         }
 
@@ -141,7 +139,7 @@ namespace MvcNormcontrol.Controllers
                 Group = student.Group,
                 Discipline = student.Discipline,
                 ExistingDocName = student.DocName,
-                ExistingUniqueDocName = student.UniqueDocName
+                ExistingUniqueDocName = student.UniqueDocName,
             };
             if (student == null)
             {
@@ -177,7 +175,7 @@ namespace MvcNormcontrol.Controllers
                     {
                         if (student.ExistingUniqueDocName != null)
                         {
-                            string filePath = Path.Combine(hostingEnvironment.WebRootPath,"Documents", student.ExistingUniqueDocName);
+                            string filePath = Path.Combine(hostingEnvironment.WebRootPath, "Documents", student.ExistingUniqueDocName);
                             System.IO.File.Delete(filePath);
                         }
                         var nameAndPath = ProcessUploadedFile(student);
@@ -198,7 +196,7 @@ namespace MvcNormcontrol.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction("details",new { id=student.ID});
+                return RedirectToAction("details", new { id = student.ID });
             }
             return View(student);
         }
@@ -227,7 +225,7 @@ namespace MvcNormcontrol.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var student = await _context.Student.FindAsync(id);
-            if (student.UniqueDocName!=null)
+            if (student.UniqueDocName != null)
             {
                 var filePath = Path.Combine(hostingEnvironment.WebRootPath, "Documents", student.UniqueDocName);
                 System.IO.File.Delete(filePath);
